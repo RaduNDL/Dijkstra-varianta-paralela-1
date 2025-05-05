@@ -1,0 +1,61 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Administrator\\Documents\\C\u002B\u002B\\Dijkstra_Paralel1\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{87AC35EB-9033-4738-ABEC-E3C5D244FE59}|Dijkstra_Paralel1\\Dijkstra_Paralel1.vcxproj|C:\\Users\\Administrator\\Documents\\C\u002B\u002B\\Dijkstra_Paralel1\\Dijkstra_Paralel1\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{87AC35EB-9033-4738-ABEC-E3C5D244FE59}|Dijkstra_Paralel1\\Dijkstra_Paralel1.vcxproj|solutionrelative:Dijkstra_Paralel1\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 6,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\Administrator\\Documents\\C\u002B\u002B\\Dijkstra_Paralel1\\Dijkstra_Paralel1\\main.cpp",
+              "RelativeDocumentMoniker": "Dijkstra_Paralel1\\main.cpp",
+              "ToolTip": "C:\\Users\\Administrator\\Documents\\C\u002B\u002B\\Dijkstra_Paralel1\\Dijkstra_Paralel1\\main.cpp",
+              "RelativeToolTip": "Dijkstra_Paralel1\\main.cpp",
+              "ViewState": "AgIAAGgAAAAAAAAAAADwv34AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-03-31T09:17:08.468Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
