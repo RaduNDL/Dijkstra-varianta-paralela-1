@@ -1,85 +1,107 @@
 #include <iostream>
 #include <vector>
-#include <queue>
+#include <limits>
 #include <fstream>
-#include <climits>
+#include <cstdlib>
+#include <ctime>
+#include <omp.h>
 #include <chrono>
-#include <thread>
-#include <mutex>
 using namespace std;
-
-const int INF = INT_MAX;
-mutex pq_mutex;
-
-void parallel_dijkstra(int V, vector<vector<pair<int, int>>>& adj, int src, const string& filename, int num_threads) {
-    vector<int> dist(V, INF);
-    dist[src] = 0;
-
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
-    pq.push({ 0, src });
-
-    auto worker = [&](int tid) {
-        while (true) {
-            pq_mutex.lock();
-            if (pq.empty()) {
-                pq_mutex.unlock();
-                break;
-            }
-            auto [d, u] = pq.top(); pq.pop();
-            pq_mutex.unlock();
-
-            if (d > dist[u]) continue;
-
-            for (auto [v, w] : adj[u]) {
-                int new_dist = dist[u] + w;
-                if (new_dist < dist[v]) {
-                    dist[v] = new_dist;
-                    pq_mutex.lock();
-                    pq.push({ new_dist, v });
-                    pq_mutex.unlock();
+using namespace std::chrono;
+const long long INF = numeric_limits<long long>::max();
+struct Edge {
+    int to;
+    long long weight;
+};
+vector<long long> dijkstra_parallel(int start, const vector<vector<Edge>>& graph) {
+    int n = graph.size();
+    vector<long long> dist(n, INF);
+    vector<bool> visited(n, false);
+    dist[start] = 0;
+    bool work_remaining = true;
+    while (work_remaining) {
+        work_remaining = false;
+#pragma omp parallel for
+        for (int u = 0; u < n; ++u) {
+            if (!visited[u] && dist[u] < INF) {
+                visited[u] = true;
+                for (const auto& edge : graph[u]) {
+                    int v = edge.to;
+                    long long weight = edge.weight;
+                    if (dist[u] + weight < dist[v]) {
+#pragma omp critical
+                        {
+                            if (dist[u] + weight < dist[v]) {
+                                dist[v] = dist[u] + weight;
+                                work_remaining = true;
+                            }
+                        }
+                    }
                 }
             }
         }
-        };
-
-    vector<thread> threads;
-    for (int i = 0; i < num_threads; ++i) {
-        threads.emplace_back(worker, i);
     }
-
-    for (auto& t : threads) {
-        t.join();
-    }
-
-    ofstream fout(filename);
-    for (int i = 0; i < V; ++i)
-        fout << i << " " << (dist[i] == INF ? -1 : dist[i]) << "\n";
-    fout.close();
+    return dist;
 }
-
 int main() {
-    ifstream fin("graph.txt");
-    if (!fin) {
-        cerr << "Fisierul graph.txt nu exista!\n";
+    srand(time(0));
+    int nodes = 100000;
+    int edges = 1000000;
+    int maxWeight = 10000000;
+    int startNode = 0;
+    auto start_gen = high_resolution_clock::now();
+    ofstream out("graph.txt");
+    if (!out.is_open()) {
+        cerr << "Error: could not create graph.txt" << endl;
         return 1;
     }
-
-    int V, E;
-    fin >> V >> E;
-    vector<vector<pair<int, int>>> adj(V);
-
-    for (int i = 0; i < E; ++i) {
-        int u, v, w;
-        fin >> u >> v >> w;
-        adj[u].push_back({ v, w });
+    out << nodes << " " << edges << "\n";
+    for (int i = 0; i < edges; ++i) {
+        int u = rand() % nodes;
+        int v = rand() % nodes;
+        while (v == u) v = rand() % nodes;
+        int weight = 1 + rand() % maxWeight;
+        out << u << " " << v << " " << weight << "\n";
     }
-
-    fin.close();
-
-    auto start = chrono::high_resolution_clock::now();
-    parallel_dijkstra(V, adj, 0, "distances_parallel.txt", thread::hardware_concurrency());
-    auto end = chrono::high_resolution_clock::now();
-
-    cout << "Dijkstra paralel a terminat in " << chrono::duration<double>(end - start).count() << " secunde\n";
+    out.close();
+    cout << "Graph written to graph.txt" << endl;
+    auto end_gen = high_resolution_clock::now();
+    auto start_read = high_resolution_clock::now();
+    ifstream infile("graph.txt");
+    if (!infile.is_open()) {
+        cerr << "Error: Unable to open graph.txt" << endl;
+        return 1;
+    }
+    infile >> nodes >> edges;
+    vector<vector<Edge>> graph(nodes);
+    for (int i = 0; i < edges; ++i) {
+        int u, v;
+        long long w;
+        infile >> u >> v >> w;
+        graph[u].push_back({ v, w });
+    }
+    infile.close();
+    cout << "Graph loaded. Running Dijkstra from node " << startNode << "..." << endl;
+    auto end_read = high_resolution_clock::now();
+    auto start_algo = high_resolution_clock::now();
+    vector<long long> distances = dijkstra_parallel(startNode, graph);
+    auto end_algo = high_resolution_clock::now();
+    ofstream outfile("distances.txt");
+    if (!outfile.is_open()) {
+        cerr << "Error: Unable to open distances.txt" << endl;
+        return 1;
+    }
+    for (int i = 0; i < nodes; ++i) {
+        if (distances[i] == INF)
+            outfile << "Node " << i << ": -1\n";
+        else
+            outfile << "Node " << i << ": " << distances[i] << "\n";
+    }
+    outfile.close();
+    cout << "Distances written to distances.txt" << endl;
+    cout << fixed;
+    cout << "Graph Generation: " << duration<double>(end_gen - start_gen).count() << " sec\n";
+    cout << "Graph Reading:    " << duration<double>(end_read - start_read).count() << " sec\n";
+    cout << "Dijkstra:         " << duration<double>(end_algo - start_algo).count() << " sec\n";
     return 0;
 }
